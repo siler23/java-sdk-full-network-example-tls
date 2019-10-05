@@ -1,4 +1,4 @@
-# Create and Deploy a Blockchain Network using Hyperledger Fabric SDK Java
+# Create and Deploy a Blockchain Network using Hyperledger Fabric SDK Java with TLS Enabled
 
 Blockchain is a shared, immutable ledger for recording the history of transactions. The Linux Foundation’s Hyperledger Fabric, the software implementation of blockchain IBM is committed to, is a permissioned network. Hyperledger Fabric is a platform for distributed ledger solutions underpinned by a modular architecture delivering high degrees of confidentiality, resiliency, flexibility and scalability.
 
@@ -46,7 +46,7 @@ When the reader has completed this pattern, they will understand how to create, 
 
 ## Pre-requisites
 
-* [Docker](https://www.docker.com/get-started) 
+* [Docker](https://www.docker.com/get-started)
 * [Docker Compose](https://docs.docker.com/compose/overview/)
 * [Git Client](https://git-scm.com/downloads) - needed for clone commands
 * [Maven](https://maven.apache.org/download.cgi) - needed to build the client. Maven is a build automation tool used primarily for Java projects. Maven addresses two aspects of building software: first, it describes how software is built, and second, it describes its dependencies.
@@ -64,43 +64,40 @@ Follow these steps to setup and run this code pattern.
 
 ### 1. Setup the Blockchain Network
 
-[Clone this repo](https://github.com/IBM/blockchain-application-using-fabric-java-sdk) using the following command.
+[Clone this repo](https://github.ibm.com/Garrett-Lee-Woodworth/java-sdk-full-network-example-tls) using the following command.
 
 ```
-$ git clone https://github.com/IBM/blockchain-application-using-fabric-java-sdk
+$ git clone https://github.ibm.com/Garrett-Lee-Woodworth/java-sdk-full-network-example-tls.git
 ```
 
 To build the blockchain network, the first step is to generate artifacts for peers and channels using cryptogen and configtx. The utilities used and steps to generate artifacts are explained [here](https://hyperledger-fabric.readthedocs.io/en/release-1.4/build_network.html). In this pattern all required artifacts for the peers and channel of the network are already generated and provided to use as-is. Artifacts can be located at:
 
    ```
-   network_resources/crypto-config
-   network_resources/config
+   network_resources\crypto-config
+   network_resources\config
    ````
 
-The automated scripts to build the network are provided under `network` directory. The `network/docker-compose.yaml` file defines the blockchain network topology. This pattern provisions a Hyperledger Fabric 1.4.1 network consisting of two organizations, each maintaining two peer node, two certificate authorities for each organization and a solo ordering service. Need to run the script as follows to build the network.
+The automated scripts to build the network are provided under `network` directory. The `network\docker-compose.yaml` file defines the blockchain network topology. This pattern provisions a Hyperledger Fabric 1.4.1 network consisting of two organizations, each maintaining two peer node, two certificate authorities for each organization and a solo ordering service. Need to run the script as follows to build the network.
 
 > **Note:** Please clean up the old docker images (if any) from your environment otherwise you may get errors while setting up network.
 
    ```
    cd network
-   chmod +x build.sh
-   ./build.sh
+   build.sh
    ```
 
 To stop the running network, run the following script.
 
    ```
    cd network
-   chmod +x stop.sh
-   ./stop.sh
+   stop.sh
    ```
 
 To delete the network completely, following script need to execute.
 
    ```
    cd network
-   chmod +x teardown.sh
-   ./teardown.sh
+   teardown.sh
    ```
 
 ### 2. Build the client based on Fabric Java SDK
@@ -118,7 +115,7 @@ To work with the deployed network using Hyperledger Fabric SDK java 1.4.1, perfo
 * Open a command terminal and navigate to the `java` directory in the repo. Run the command `mvn install`.
 
    ```
-   cd ../java
+   cd ..\java
    mvn install
    ```
 
@@ -126,13 +123,13 @@ To work with the deployed network using Hyperledger Fabric SDK java 1.4.1, perfo
 
    ```
    cd target
-   cp blockchain-java-sdk-0.0.1-SNAPSHOT-jar-with-dependencies.jar blockchain-client.jar
+   copy blockchain-java-sdk-0.0.1-SNAPSHOT-jar-with-dependencies.jar blockchain-client.jar
    ```
 
 * Copy this built jar into `network_resources` directory. This is required as the java code can access required artifacts during execution.
 
    ```
-   cp blockchain-client.jar ../../network_resources
+   copy blockchain-client.jar ..\..\network_resources
    ```
 
 ### 3. Create and Initialize the channel
@@ -140,7 +137,7 @@ To work with the deployed network using Hyperledger Fabric SDK java 1.4.1, perfo
 In this code pattern, we create one channel `mychannel` which is joined by all four peers. The java source code can be seen at  `src/main/java/org/example/network/CreateChannel.java`. To create and initialize the channel, run the following command.
 
    ```
-   cd ../../network_resources
+   cd ..\..\network_resources
    java -cp blockchain-client.jar org.example.network.CreateChannel
    ```
 
@@ -279,4 +276,3 @@ Blockchain network has been setup completely and is ready to use. Now we can tes
 This code pattern is licensed under the Apache Software License, Version 2.  Separate third party code objects invoked within this code pattern are licensed by their respective providers pursuant to their own separate licenses. Contributions are subject to the [Developer Certificate of Origin, Version 1.1 (DCO)](https://developercertificate.org/) and the [Apache Software License, Version 2](https://www.apache.org/licenses/LICENSE-2.0.txt).
 
 [Apache Software License (ASL) FAQ](https://www.apache.org/foundation/license-faq.html#WhatDoesItMEAN)
-
