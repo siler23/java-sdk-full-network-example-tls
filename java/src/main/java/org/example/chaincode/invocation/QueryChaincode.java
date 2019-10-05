@@ -83,6 +83,7 @@ public class QueryChaincode {
 			String orderer_TLS = Config.ORDERER_TLSCA_PEMFILE;
 
 			Properties orderer_properties = new Properties();
+			orderer_properties.put("pemFile", orderer_TLS);
 			orderer_properties.setProperty("sslProvider", "openSSL");
       orderer_properties.setProperty("negotiationType", "TLS");
 			Orderer orderer = fabClient.getInstance().newOrderer(orderer_name, orderer_url, orderer_properties);

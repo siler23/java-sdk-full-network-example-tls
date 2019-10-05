@@ -74,6 +74,7 @@ public class CreateChannel {
 			String orderer_TLS = Config.ORDERER_TLSCA_PEMFILE;
 
 			Properties orderer_properties = new Properties();
+			orderer_properties.put("pemFile", orderer_TLS);
 			orderer_properties.setProperty("sslProvider", "openSSL");
 			orderer_properties.setProperty("negotiationType", "TLS");
 
