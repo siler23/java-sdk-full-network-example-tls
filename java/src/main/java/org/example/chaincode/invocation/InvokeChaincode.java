@@ -1,15 +1,15 @@
-/****************************************************** 
- *  Copyright 2018 IBM Corporation 
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
+/******************************************************
+ *  Copyright 2018 IBM Corporation
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
  *  limitations under the License.
- */ 
+ */
 package org.example.chaincode.invocation;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Properties;
 
 import org.example.client.CAClient;
 import org.example.client.ChannelClient;
@@ -36,7 +37,7 @@ import org.hyperledger.fabric.sdk.ProposalResponse;
 import org.hyperledger.fabric.sdk.TransactionProposalRequest;
 
 /**
- * 
+ *
  * @author Balaji Kadambi
  *
  */
@@ -50,7 +51,11 @@ public class InvokeChaincode {
 		try {
             Util.cleanUp();
 			String caUrl = Config.CA_ORG1_URL;
-			CAClient caClient = new CAClient(caUrl, null);
+			String TLS_FILE = Config.CA_ORG1_PEMFILE;
+			Properties properties = new Properties();
+			properties.put("pemFile", TLS_FILE);
+
+			CAClient caClient = new CAClient(caUrl, properties);
 			// Enroll Admin to Org1MSP
 			UserContext adminUserContext = new UserContext();
 			adminUserContext.setName(Config.ADMIN);
@@ -58,14 +63,35 @@ public class InvokeChaincode {
 			adminUserContext.setMspId(Config.ORG1_MSP);
 			caClient.setAdminUserContext(adminUserContext);
 			adminUserContext = caClient.enrollAdminUser(Config.ADMIN, Config.ADMIN_PASSWORD);
-			
+
 			FabricClient fabClient = new FabricClient(adminUserContext);
-			
+
 			ChannelClient channelClient = fabClient.createChannelClient(Config.CHANNEL_NAME);
 			Channel channel = channelClient.getChannel();
-			Peer peer = fabClient.getInstance().newPeer(Config.ORG1_PEER_0, Config.ORG1_PEER_0_URL);
-			EventHub eventHub = fabClient.getInstance().newEventHub("eventhub01", "grpc://localhost:7053");
-			Orderer orderer = fabClient.getInstance().newOrderer(Config.ORDERER_NAME, Config.ORDERER_URL);
+
+			// Set Peer Variables
+			String peer_name = Config.ORG1_PEER_0;
+			String peer_url = Config.ORG1_PEER_0_URL;
+			String peer_TLS = Config.TLSCA_ORG1_PEMFILE;
+			String event_url = "grpcs://peer0.org1.example.com:7053";
+
+			Properties peer_properties = new Properties();
+			peer_properties.put("pemFile", peer_TLS);
+			peer_properties.setProperty("sslProvider", "openSSL");
+			peer_properties.setProperty("negotiationType", "TLS");
+
+			Peer peer = fabClient.getInstance().newPeer(peer_name, peer_url, peer_properties);
+			EventHub eventHub = fabClient.getInstance().newEventHub("eventhub01", event_url, peer_properties);
+
+			// Set Orderer Variables
+			String orderer_name = Config.ORDERER_NAME;
+			String orderer_url = Config.ORDERER_URL;
+			String orderer_TLS = Config.ORDERER_TLSCA_PEMFILE;
+
+			Properties orderer_properties = new Properties();
+			orderer_properties.setProperty("sslProvider", "openSSL");
+      orderer_properties.setProperty("negotiationType", "TLS");
+			Orderer orderer = fabClient.getInstance().newOrderer(orderer_name, orderer_url, orderer_properties);
 			channel.addPeer(peer);
 			channel.addEventHub(eventHub);
 			channel.addOrderer(orderer);
@@ -80,17 +106,17 @@ public class InvokeChaincode {
 			request.setProposalWaitTime(1000);
 
 			Map<String, byte[]> tm2 = new HashMap<>();
-			tm2.put("HyperLedgerFabric", "TransactionProposalRequest:JavaSDK".getBytes(UTF_8)); 																								
-			tm2.put("method", "TransactionProposalRequest".getBytes(UTF_8)); 
+			tm2.put("HyperLedgerFabric", "TransactionProposalRequest:JavaSDK".getBytes(UTF_8));
+			tm2.put("method", "TransactionProposalRequest".getBytes(UTF_8));
 			tm2.put("result", ":)".getBytes(UTF_8));
-			tm2.put(EXPECTED_EVENT_NAME, EXPECTED_EVENT_DATA); 
+			tm2.put(EXPECTED_EVENT_NAME, EXPECTED_EVENT_DATA);
 			request.setTransientMap(tm2);
 			Collection<ProposalResponse> responses = channelClient.sendTransactionProposal(request);
 			for (ProposalResponse res: responses) {
 				Status status = res.getStatus();
 				Logger.getLogger(InvokeChaincode.class.getName()).log(Level.INFO,"Invoked createCar on "+Config.CHAINCODE_1_NAME + ". Status - " + status);
 			}
-									
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
