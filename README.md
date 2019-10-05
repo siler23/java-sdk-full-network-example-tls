@@ -127,7 +127,7 @@ To work with the deployed network using Hyperledger Fabric SDK java 1.4.1, perfo
 
    ```
    cd ..\java
-   mvn install
+   mvn clean install
    ```
 
 * A jar file `blockchain-java-sdk-0.0.1-SNAPSHOT-jar-with-dependencies.jar` is built and can be found under the `target` folder. This jar can be renamed to `blockchain-client.jar` to keep the name short.
