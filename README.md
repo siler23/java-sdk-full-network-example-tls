@@ -62,6 +62,17 @@ Follow these steps to setup and run this code pattern.
 5. [Register and enroll users](#5-register-and-enroll-users)
 6. [Perform Invoke and Query on network](#6-perform-invoke-and-query-on-network)
 
+### 0. Edit Hosts File to include hostnames of network Components
+
+Add this one line to your hosts file this can be accessed on Windows by typing in Notepad in your search pad right-clicking and using `Run as administrator` and clicking File Open and then choosing `All Files` from the dropdown instead of just `*.txt` and navigating to `C:\Windows\System32\drivers\etc` and then add the following line.
+
+```
+127.0.0.1 localhost orderer.example.com ca.org2.example.com ca.org1.example.com peer0.org1.example.com peer1.org1.example.com peer0.org2.example.com peer1.org2.example.com
+```
+Please save afterward with ctrl-s.
+
+For more detailed instructions with pictures please visit [this great guide](https://winaero.com/blog/edit-hosts-file-windows-10/)
+
 ### 1. Setup the Blockchain Network
 
 [Clone this repo](https://github.ibm.com/Garrett-Lee-Woodworth/java-sdk-full-network-example-tls) using the following command.
